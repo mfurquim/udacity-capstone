@@ -1,0 +1,151 @@
+\documentclass[12pt,openright,hidelinks,twoside,a4paper,english,french,spanish]{abntex2}
+
+\usepackage{cmap}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lastpage}
+\usepackage{indentfirst}
+\usepackage[table]{xcolor}
+\usepackage{graphicx}
+\usepackage{units}
+\usepackage[brazilian,hyperpageref]{backref}
+\usepackage[alf]{abntex2cite}
+\usepackage{bold-extra}
+\usepackage{eso-pic}
+\usepackage[procnames]{listings}
+\usepackage{enumerate}
+\usepackage[section]{placeins}
+
+\usepackage{amsthm}
+\usepackage{amssymb, amsmath, MnSymbol}
+\usepackage{multirow}
+\usepackage{longtable}
+\usepackage{rotating}
+\usepackage{textcomp}
+\usepackage{nicefrac}
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+\usepackage{subcaption}
+\usepackage{pdfpages}
+\usepackage{colortbl}
+\usepackage{pgf}
+\usepackage{fancyvrb}
+\usepackage{placeins}
+\usepackage{chngcntr}
+
+\definecolor{blue}{RGB}{41,5,195}
+\makeatletter
+\hypersetup{
+     	%pagebackref=true,
+		pdftitle={\@title},
+		pdfauthor={\@author},
+    	pdfsubject={\imprimirpreambulo},
+	    pdfcreator={LaTeX with abnTeX2},
+		pdfkeywords={abnt}{latex}{abntex}{abntex2}{trabalho acadêmico},
+		colorlinks=true,       		% false: boxed links; true: colored links
+    	linkcolor=blue,          	% color of internal links
+    	citecolor=blue,        		% color of links to bibliography
+    	filecolor=magenta,      		% color of file links
+		urlcolor=blue,
+		bookmarksdepth=4
+}
+\makeatother
+\setlength{\parindent}{1.3cm}
+\setlength{\parskip}{0.2cm}
+\makeindex
+
+
+\begin{document}
+
+%\frenchspacing
+
+\hypertarget{capstone-proposal}{%
+\section*{Capstone Proposal: Stock Recommendation}\label{capstone-proposal}}
+
+People who operates in day trade have to analyze the previous days and
+recognize the stock movement patterns. There is a certain limit to how
+much attention humans can give to tasks. Opening multiple computer
+windows to operate on different companies' assets can be effortful.
+
+Whereas, Machine Learning models are capable of recognizing patterns and
+make decisions faster. Furthermore, it can be scaled to cover more stock
+options.
+
+The proposal for this capstone is an app which will recommend stock
+operations to be concluded in the same day.
+
+\hypertarget{data}{%
+\subsection*{Data}\label{data}}
+
+The dataset used is the \emph{Huge Stock Price Data: Intraday Minute
+Bar} by \href{https://www.kaggle.com/arashnic}{M\"{o}bius} which can be
+found at
+\href{https://www.kaggle.com/datasets/arashnic/stock-data-intraday-minute-bar}{kaggle}
+and
+\href{https://github.com/FutureSharks/financial-data/tree/master/pyfinancialdata}{github}.
+
+The data used to train the model will be the minute-by-minute data of
+stocks. Among many others, the stocks can be:
+
+\begin{lstlisting}
+$ tree -L 2 data/stocks
+data/stocks/
+\-- histdata/
+    |-- ETXEUR/
+    |-- GRXEUR/
+    |-- JPXJPY/
+    |-- SPXUSD/
+    \-- README.md
+\end{lstlisting}
+
+Here is an example of the EUR\_USD:
+
+\begin{lstlisting}[language=Python]
+import pyfinancialdata
+data = pyfinancialdata.get(
+    provider="oanda",
+	instrument="EUR_USD",
+	year=2017,
+)
+data.tail(3)
+                       close     high      low     open  volume    price
+date
+2017-12-29 21:57:00  1.20045  1.20071  1.20004  1.20018      50  1.20045
+2017-12-29 21:58:00  1.20041  1.20041  1.20041  1.20041       1  1.20041
+2017-12-29 21:59:00  1.20039  1.20039  1.19970  1.20036      14  1.20039
+\end{lstlisting}
+
+The data will be explored and cleaned if necessary. Then, it will be
+prepared and transformed to provide the model.
+
+\hypertarget{algorithms-and-models}{%
+\subsection*{Algorithms and models}\label{algorithms-and-models}}
+
+A couple of algorithms will be defined and the models will be trained
+with different hyperparameters. The models will be compared between
+themselves according to accuracy and efficiency. The accuracy will be
+calculated by the root mean square error of the prediction and the real
+data. The efficiency will be measured by calculating the possible profit
+by the end of the day.
+
+One model will be chosen to be deployed to production. An api will be
+developed to access the model and calculate the recommendation. The api
+will then calculate the amount and whether to buy or sell the stock in
+order to have profit.
+
+A report will be written structured as the examples given at
+\href{https://github.com/udacity/machine-learning/tree/master/projects/capstone}{udacity/machine-learning}
+
+\hypertarget{reference}{%
+\subsection*{Reference}\label{reference}}
+
+The materials that will be used as reference are the following:
+\begin{itemize}
+	\item[Course] \href{https://www.khanacademy.org/economics-finance-domain/core-finance/stock-and-bonds}{Unit: Stocks and bonds} from Khan Academy
+	\item[Course] \href{https://classroom.udacity.com/courses/ud501}{Machine Learning for Trading} from Udacity
+	\item[Book] Machine Learning for Algorithmic Trading by Stefan Jansen
+	\item[Book] \href{https://home.tpq.io/books/py4fi/}{Python for Finance} by Yves Hilpisch
+\end{itemize}
+
+\end{document}
