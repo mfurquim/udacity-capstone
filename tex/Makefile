@@ -1,38 +1,29 @@
 all: tex pdf
 
 TARGET = proposal.pdf
-MKD_FILE = $(addsuffix .md,  $(basename $(TARGET)))
+AUX_FILE = $(addsuffix .aux, $(basename $(TARGET)))
+DVI_FILE = $(addsuffix .dvi, $(basename $(TARGET)))
+PDF_FILE = $(addsuffix .pdf, $(basename $(TARGET)))
+PS_FILE  = $(addsuffix .ps,  $(basename $(TARGET)))
+TEX_FILE = $(addsuffix .tex, $(basename $(TARGET)))
+BIB_FILE = $(addsuffix .bib, $(basename $(TARGET)))
 
 BIBTEX = bibtex
 LATEX  = pdflatex
 
-MAIN_FILE = tmp.tex
-AUX_FILE  = $(addsuffix .aux, $(basename $(MAIN_FILE)))
-DVI_FILE  = $(addsuffix .dvi, $(basename $(MAIN_FILE)))
-PDF_FILE  = $(addsuffix .pdf, $(basename $(MAIN_FILE)))
-PS_FILE   = $(addsuffix .ps,  $(basename $(MAIN_FILE)))
-TEX_FILE  = $(addsuffix .tex, $(basename $(MAIN_FILE)))
-
-CC=pandoc
-FLAGS=--filter pandoc-eqnos --filter pandoc-tablenos --from=markdown-smart --to=latex --indented-code-classes=numberLines --highlight-style=zenburn --listings --ascii --number-sections
-
 all:
-	@make tex
 	@make pdf
 
 tex:
-	@echo "MD -> TEX"
-	iconv -t utf-8 proposal.md | $(CC) $(FLAGS) --output=$(TEX_FILE)
-	cat beg.tex > tmp.tex
-	cat proposal.tex >> tmp.tex
-	cat end.tex >> tmp.tex
+	$(MAKE) -C md tex
 
-pdf: $(MAIN_FILE) bibliografia.bib
-	$(LATEX) -shell-escape $(MAIN_FILE)
+pdf: $(TEX_FILE) $(BIB_FILE)
+	$(LATEX) -shell-escape $(TEX_FILE)
 	$(BIBTEX) $(AUX_FILE)
-	$(LATEX) -shell-escape $(MAIN_FILE)
-	$(LATEX) -shell-escape $(MAIN_FILE)
-	@mv tmp.pdf $(TARGET)
+	$(LATEX) -shell-escape $(TEX_FILE)
+	$(LATEX) -shell-escape $(TEX_FILE)
+	@cp -v $(TARGET) ../$(TARGET)
+	@rm -vf *.brf *.lol *.idx *.lof *.lot *.toc *.bbl *.blg *.log *.aux *.dvi *.out
 
 clean:
-	@rm tmp.* -vf *.brf *.lol *.idx *.lof *.lot *.toc *.bbl *.blg *.log *.aux *.dvi
+	@rm -vf *.brf *.lol *.idx *.lof *.lot *.toc *.bbl *.blg *.log *.aux *.dvi *.tex *.out *.pdf
