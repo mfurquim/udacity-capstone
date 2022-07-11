@@ -69,11 +69,9 @@ The materials that will be used as reference are the following:
 
 - Article: Customer Segmentation: Arvato Bertelsmann Project - A simplified technical report explaining my solution to building client profiles, targetting customers through demographics data, and communicating findings https://towardsdatascience.com/customer-segmentation-arvato-bertelsmann-project-44e73210a1b7
 
-# Andrew Ng
+# Andrew Ng - Dimensionality Reduction
 
-## Dimensionality Reduction
-
-### Data compression
+## Data compression
 
 Allows to approximate the original by projecting to a reduced dimension.
 Halfs the memory requirements to store data.
@@ -95,42 +93,56 @@ $\Sigma$ is $n \times n$ matrix. $(x^{(i)})$ is $n \times 1$ vector and $(x^{(i)
 $[U,S,V] = svd(\Sigma)$
 
 \begin{align*}
-X = \begin{bmatrix}
+X =
+\left[
+\begin{array}{ccc}
 - & {x^1}^T & -\\
   & \vdots &   \\
 - & {x^m}^T & - \\
-\end{bmatrix} \rightarrow \Sigma = \frac{1}{m} \times X^T \times X
+\end{array}
+\right]
+\rightarrow \Sigma = \frac{1}{m} \times X^T \times X
 \end{align*}
 
 Output of $svd$ are three matrices: $U$, $S$, and $V$.
 $U$ is a $n \times n$ matrix, where each column is the vector $u^{(i)}$.
 
-$U =
-\begin{bmatrix}
-\textpipe & \textpipe & & \textpipe & & \textpipe\\
-u^1 & u^2 & \cdots & u^k & \cdots & u^n\\
-\textpipe & \textpipe & & \textpipe & & \textpipe
-\end{bmatrix} \in \mathbb{R}^{n \times n}$
+\begin{align*}
+U = \left[
+\begin{array}{cccccc}
+\textpipe & \textpipe &        & \textpipe &        & \textpipe\\
+u^1       &       u^2 & \cdots & u^k       & \cdots & u^n\\
+\textpipe & \textpipe &        & \textpipe &        & \textpipe
+\end{array}
+\right]
+\in \mathbb{R}^{n \times n}
+\end{align*}
 
 $x\in\mathbb{R}^n\rightarrow z\in\mathbb{R}^k$
 
-$U_{reduce} =
-\begin{bmatrix}
+\begin{align*}
+U_{reduce} = \left[
+\begin{array}{cccc}
 \textpipe & \textpipe & & \textpipe\\
 u^1 & u^2 & \cdots & u^k\\
 \textpipe & \textpipe & & \textpipe
-\end{bmatrix} \in \mathbb{R}^{n \times k}$
+\end{array}
+\right]
+\in \mathbb{R}^{n \times k}
+\end{align*}
 
 Take the first $k$ vectors to reduce to $k$ dimensions.
 
 \begin{align*}
 Z &= U_{reduce}^T x\\
-  &= \begin{bmatrix}
+  &= \left[
+\begin{array}{cccc}
 - & u^1 & -\\
 - & u^2 & -\\
   & \vdots &   \\
 - & u^k & - \\
-\end{bmatrix}
+\end{array}
+\right]
 x
 \end{align*}
 
@@ -152,7 +164,7 @@ Typically, choose $k$ to be smallest value so that:
 
 "99% of variance is retained"
 
-## Algorithm
+### Algorithm
 
 Try PCA with $k=1$:
 
@@ -173,12 +185,15 @@ $[U,S,V] = svd(\Sigma)$
 
 The $S$ matrix is a diagonal square matrix $n \times n$:
 
+
 \begin{align*}
-S = \begin{bmatrix}
+S = \left[
+\begin{array}{ccc}
 s_{11}   &        & \bigzero \\
          & \ddots &          \\
 \bigzero &        & s_{nn}   \\
-\end{bmatrix}
+\end{array}
+\right]
 \end{align*}
 
 
@@ -199,7 +214,63 @@ s_{11}   &        & \bigzero \\
 \end{align*}
 
 
+### Supervised Learning Speedup
 
+$(x^{(1)},y^{(1)}),(x^{(2)},y^{(2)}),\dots,(x^{(m)},y^{(m)})$
+
+$x^{(i)}\in\mathbb{R}^{10,000}$
+
+\begin{align*}
+x^{(1)}, x^{(2)},& \dots, x^{(m)}, \in\mathbb{R}^{10,000}\\
+&\downarrow \text{PCA}\\
+z^{(1)}, z^{(2)},& \dots, z^{(m)}, \in\mathbb{R}^{1,000}\\
+\end{align*}
+
+New training set
+
+$(z^{(1)},y^{(1)}),(z^{(2)},y^{(2)}),\dots,(z^{(m)},y^{(m)})$
+
+Hypothesis
+
+\begin{align*}
+h_{\uptheta}(z) = \frac{1}{1+e^{-\uptheta^{T}z}}
+\end{align*}
+
+If you have new example, take x, map throug the same PCA to get the corresponding z, and then z can
+
+What PCA does is mapping $x^{(i)} \rightarrow z^{(i)}$. This should be done only on the training set. This mapping can be applied as well to examples $x^{(i)}_{cv}$ and $x^{(i)}_{test}$ in the cross validation and test sets.
+
+## Bad us of PCA: To prevent overfitting
+
+Use $z^{(i)}$ instead of $x^{(i)}$ to reduce the number of features to $k<n$.
+Thus, fewer features, less likely to overfit.
+
+Not a good way to address overfitting.
+Use regularization instead.
+
+\begin{align*}
+\min_{\theta} \frac{1}{2m} \sum^{m}_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)})^2 + \frac{\lambda}{2m}\sum^{n}_{j=1}\theta^2_j
+\end{align*}
+
+Regularization uses the labels, whereas PCA don't and might throw away valuable information.
+
+### Uses where it shouldn't be
+
+Design of ML system:
+
+- Get training set $(x^{(1)},y^{(1)}),(x^{(2)},y^{(2)}),\dots,(x^{(m)},y^{(m)})$
+
+- Run PCA to reduce $x^{(i)}$ in dimension to get $z^{(i)}$
+
+- Train logistic regression on $(z^{(1)},y^{(1)}),\dots,(z^{(m)},y^{(m)})$
+
+- Test on test set: Map $x^{(i)}_{test}$ to $z^{(i)}_{test}$.
+
+- Run $h_{\uptheta}(z)$ on on $(z^{(1)}_{test},y^{(1)}_{test}),\dots,(z^{(m)}_{test},y^{(m)}_{test})$
+
+How about doint the whole thing without using PCA?
+
+Before implementing PCA, first try running whatever you want to do with the original/raw data $x^{(i)}$. Only if that doesn't do what you want, then implement PCA and consider using $z^{(i)}$.
 
 # A Tutorial on Principal Component Analysis
 \cite{shlens2014tutorial}

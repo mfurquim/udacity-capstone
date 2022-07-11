@@ -101,14 +101,12 @@ The materials that will be used as reference are the following:
   https://towardsdatascience.com/customer-segmentation-arvato-bertelsmann-project-44e73210a1b7
 \end{itemize}
 
-\hypertarget{andrew-ng}{%
-\section{Andrew Ng}\label{andrew-ng}}
-
-\hypertarget{dimensionality-reduction}{%
-\subsection{Dimensionality Reduction}\label{dimensionality-reduction}}
+\hypertarget{andrew-ng---dimensionality-reduction}{%
+\section{Andrew Ng - Dimensionality
+Reduction}\label{andrew-ng---dimensionality-reduction}}
 
 \hypertarget{data-compression}{%
-\subsubsection{Data compression}\label{data-compression}}
+\subsection{Data compression}\label{data-compression}}
 
 Allows to approximate the original by projecting to a reduced dimension.
 Halfs the memory requirements to store data. More importantly, learning
@@ -131,32 +129,56 @@ vector and \((x^{(i)})^T\) is \(1 \times n\) vector.
 \([U,S,V] = svd(\Sigma)\)
 
 \begin{align*}
-X = \begin{bmatrix}
+X =
+\left[
+\begin{array}{ccc}
 - & {x^1}^T & -\\
   & \vdots &   \\
 - & {x^m}^T & - \\
-\end{bmatrix} \rightarrow \Sigma = \frac{1}{m} \times X^T \times X
+\end{array}
+\right]
+\rightarrow \Sigma = \frac{1}{m} \times X^T \times X
 \end{align*}
 
 Output of \(svd\) are three matrices: \(U\), \(S\), and \(V\). \(U\) is
 a \(n \times n\) matrix, where each column is the vector \(u^{(i)}\).
 
-\(U = \begin{bmatrix} \textpipe & \textpipe & & \textpipe & & \textpipe\\ u^1 & u^2 & \cdots & u^k & \cdots & u^n\\ \textpipe & \textpipe & & \textpipe & & \textpipe \end{bmatrix} \in \mathbb{R}^{n \times n}\)
+\begin{align*}
+U = \left[
+\begin{array}{cccccc}
+\textpipe & \textpipe &        & \textpipe &        & \textpipe\\
+u^1       &       u^2 & \cdots & u^k       & \cdots & u^n\\
+\textpipe & \textpipe &        & \textpipe &        & \textpipe
+\end{array}
+\right]
+\in \mathbb{R}^{n \times n}
+\end{align*}
 
 \(x\in\mathbb{R}^n\rightarrow z\in\mathbb{R}^k\)
 
-\(U_{reduce} = \begin{bmatrix} \textpipe & \textpipe & & \textpipe\\ u^1 & u^2 & \cdots & u^k\\ \textpipe & \textpipe & & \textpipe \end{bmatrix} \in \mathbb{R}^{n \times k}\)
+\begin{align*}
+U_{reduce} = \left[
+\begin{array}{cccc}
+\textpipe & \textpipe & & \textpipe\\
+u^1 & u^2 & \cdots & u^k\\
+\textpipe & \textpipe & & \textpipe
+\end{array}
+\right]
+\in \mathbb{R}^{n \times k}
+\end{align*}
 
 Take the first \(k\) vectors to reduce to \(k\) dimensions.
 
 \begin{align*}
 Z &= U_{reduce}^T x\\
-  &= \begin{bmatrix}
+  &= \left[
+\begin{array}{cccc}
 - & u^1 & -\\
 - & u^2 & -\\
   & \vdots &   \\
 - & u^k & - \\
-\end{bmatrix}
+\end{array}
+\right]
 x
 \end{align*}
 
@@ -178,7 +200,7 @@ Typically, choose \(k\) to be smallest value so that: \begin{align*}
 "99\% of variance is retained"
 
 \hypertarget{algorithm}{%
-\subsection{Algorithm}\label{algorithm}}
+\subsubsection{Algorithm}\label{algorithm}}
 
 Try PCA with \(k=1\):
 
@@ -199,11 +221,13 @@ Try PCA with \(k=1\):
 The \(S\) matrix is a diagonal square matrix \(n \times n\):
 
 \begin{align*}
-S = \begin{bmatrix}
+S = \left[
+\begin{array}{ccc}
 s_{11}   &        & \bigzero \\
          & \ddots &          \\
 \bigzero &        & s_{nn}   \\
-\end{bmatrix}
+\end{array}
+\right]
 \end{align*}
 
 \begin{align*}
@@ -221,6 +245,82 @@ s_{11}   &        & \bigzero \\
 {\sum_{i=1}^n S_{ii}}
 \geq 0.99
 \end{align*}
+
+\hypertarget{supervised-learning-speedup}{%
+\subsubsection{Supervised Learning
+Speedup}\label{supervised-learning-speedup}}
+
+\((x^{(1)},y^{(1)}),(x^{(2)},y^{(2)}),\dots,(x^{(m)},y^{(m)})\)
+
+\(x^{(i)}\in\mathbb{R}^{10,000}\)
+
+\begin{align*}
+x^{(1)}, x^{(2)},& \dots, x^{(m)}, \in\mathbb{R}^{10,000}\\
+&\downarrow \text{PCA}\\
+z^{(1)}, z^{(2)},& \dots, z^{(m)}, \in\mathbb{R}^{1,000}\\
+\end{align*}
+
+New training set
+
+\((z^{(1)},y^{(1)}),(z^{(2)},y^{(2)}),\dots,(z^{(m)},y^{(m)})\)
+
+Hypothesis
+
+\begin{align*}
+h_{\uptheta}(z) = \frac{1}{1+e^{-\uptheta^{T}z}}
+\end{align*}
+
+If you have new example, take x, map throug the same PCA to get the
+corresponding z, and then z can
+
+What PCA does is mapping \(x^{(i)} \rightarrow z^{(i)}\). This should be
+done only on the training set. This mapping can be applied as well to
+examples \(x^{(i)}_{cv}\) and \(x^{(i)}_{test}\) in the cross validation
+and test sets.
+
+\hypertarget{bad-us-of-pca-to-prevent-overfitting}{%
+\subsection{Bad us of PCA: To prevent
+overfitting}\label{bad-us-of-pca-to-prevent-overfitting}}
+
+Use \(z^{(i)}\) instead of \(x^{(i)}\) to reduce the number of features
+to \(k<n\). Thus, fewer features, less likely to overfit.
+
+Not a good way to address overfitting. Use regularization instead.
+
+\begin{align*}
+\min_{\theta} \frac{1}{2m} \sum^{m}_{i=1}(h_{\theta}(x^{(i)}) - y^{(i)})^2 + \frac{\lambda}{2m}\sum^{n}_{j=1}\theta^2_j
+\end{align*}
+
+Regularization uses the labels, whereas PCA don't and might throw away
+valuable information.
+
+\hypertarget{uses-where-it-shouldnt-be}{%
+\subsubsection{Uses where it shouldn't
+be}\label{uses-where-it-shouldnt-be}}
+
+Design of ML system:
+
+\begin{itemize}
+\item
+  Get training set
+  \((x^{(1)},y^{(1)}),(x^{(2)},y^{(2)}),\dots,(x^{(m)},y^{(m)})\)
+\item
+  Run PCA to reduce \(x^{(i)}\) in dimension to get \(z^{(i)}\)
+\item
+  Train logistic regression on
+  \((z^{(1)},y^{(1)}),\dots,(z^{(m)},y^{(m)})\)
+\item
+  Test on test set: Map \(x^{(i)}_{test}\) to \(z^{(i)}_{test}\).
+\item
+  Run \(h_{\uptheta}(z)\) on on
+  \((z^{(1)}_{test},y^{(1)}_{test}),\dots,(z^{(m)}_{test},y^{(m)}_{test})\)
+\end{itemize}
+
+How about doint the whole thing without using PCA?
+
+Before implementing PCA, first try running whatever you want to do with
+the original/raw data \(x^{(i)}\). Only if that doesn't do what you
+want, then implement PCA and consider using \(z^{(i)}\).
 
 \hypertarget{a-tutorial-on-principal-component-analysis}{%
 \section{A Tutorial on Principal Component
@@ -934,9 +1034,9 @@ and update models as and when needed.
 \subsection{Chapter 4: Feature Engineering and
 Selection}\label{chapter-4-feature-engineering-and-selection}}
 
-\hypertarget{dimensionality-reduction-1}{%
+\hypertarget{dimensionality-reduction}{%
 \subsubsection{Dimensionality
-Reduction}\label{dimensionality-reduction-1}}
+Reduction}\label{dimensionality-reduction}}
 
 Dealing with a lot of features can lead to issues like model
 overfitting, complex models, and many more dimensionality problems.
