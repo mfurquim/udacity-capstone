@@ -1,9 +1,9 @@
 # Domain Background
 
-One of the principal steps in the machine learning process is the feature engineering.
-It falls into the _Data Preparation_ step in the CRISP-DM, which is usually the most time consuming (60%~70% of time in overall project).
-In feature engineering there are two different approaches: **feature selection** and **feature extraction**.
-Principal Component Analysis (PCA) is a process of **feature extraction** to reduce the dimensionality of the data by understanding the individual significance for a feature on the result of the outcome.
+One of the principal steps in the machine learning process is the feature engineering\cite{sarkar2017practical}.
+It falls into the Data Preparation step in the CRISP-DM, which is usually the most time consuming (60%~70% of time in overall project)\cite{sarkar2017practical}.
+In feature engineering there are two different approaches: **feature selection** and **feature extraction**\cite{sarkar2017practical}.
+Principal Component Analysis (PCA) is a process of feature extraction\cite{sarkar2017practical} to reduce the dimensionality of the data by understanding the individual significance for a feature on the result of the outcome\cite{shlens2014tutorial}.
 If two features are directly related and change at the same rate, then there is no need to have both of them to predict the output.
 For instance, if there are two features which measure a phenomenon, one in meters and another one in inches, they are measuring the same thing but in different scales.
 So there would only be need to keep one of them.
@@ -21,13 +21,23 @@ This project will compare by how much the performance is increased by applying t
 
 # Datasets and Inputs
 
-This project will use the Arvato's dataset provided by the course.
-The Arvato's dataset is a compilation of financial data from their customers.
-The aim of the project is to predict wheather a person is more likely to be a customer of theirs based on their financial data.
+The data set used in this project will be the Arvato's data set provided by the course in the Kaggle Competition\cite{arvato_kaggle_competition},
+The Arvato's data set is a compilation of financial data from their customers.
+The customers data set has 369 features (columns) and almost 200000 observations (rows), whereas the Germany data set contains 366 features (columns) almost 900000 observations (rows).
+The additional features from the customers data set are: customer_group, online_purchase, and product_group.
+On listing \ref{lst:add_feat} is a sample of those different features.
+
+\begin{listing}[htp]
+  \inputminted{python}{code/sample_additional_features.py}
+  \caption{Sample of Additional Features}
+  \label{lst:add_feat}
+\end{listing}
+
 
 # Solution Statement
 
 The model after having done the Principal Component Analysis will have a better performance when training and predicting the possible customers.
+
 
 
 # Evaluation Metrics
@@ -59,7 +69,140 @@ The materials that will be used as reference are the following:
 
 - Article: Customer Segmentation: Arvato Bertelsmann Project - A simplified technical report explaining my solution to building client profiles, targetting customers through demographics data, and communicating findings https://towardsdatascience.com/customer-segmentation-arvato-bertelsmann-project-44e73210a1b7
 
+# Andrew Ng
+
+## Dimensionality Reduction
+
+### Data compression
+
+Allows to approximate the original by projecting to a reduced dimension.
+Halfs the memory requirements to store data.
+More importantly, learning algorithms to run faster.
+
+
+Data preprocessing before PCA: feature scaling/mean normalization.
+Mean of each feature: $\mu_j = \frac{1}{m} \displaystyle\sum^{m}_{i=1}x_j^{(i)}$
+Replace each $x_j^{(i)}$ with $x_j - \mu_j$ to make feature have zero mean.
+If different scales, scale features to have comparable range of values.
+
+Reduce data from $n$-dimensions to $k$-dimensions
+Compute the covariance matrix:
+$\Sigma = \frac{1}{m}\displaystyle\sum_{i=1}^n(x^{(i)})(x^{(i)})^T$
+Compute eigenvectors of matrix $\Sigma$
+
+$\Sigma$ is $n \times n$ matrix. $(x^{(i)})$ is $n \times 1$ vector and $(x^{(i)})^T$ is $1 \times n$ vector.
+
+$[U,S,V] = svd(\Sigma)$
+
+\begin{align*}
+X = \begin{bmatrix}
+- & {x^1}^T & -\\
+  & \vdots &   \\
+- & {x^m}^T & - \\
+\end{bmatrix} \rightarrow \Sigma = \frac{1}{m} \times X^T \times X
+\end{align*}
+
+Output of $svd$ are three matrices: $U$, $S$, and $V$.
+$U$ is a $n \times n$ matrix, where each column is the vector $u^{(i)}$.
+
+$U =
+\begin{bmatrix}
+\textpipe & \textpipe & & \textpipe & & \textpipe\\
+u^1 & u^2 & \cdots & u^k & \cdots & u^n\\
+\textpipe & \textpipe & & \textpipe & & \textpipe
+\end{bmatrix} \in \mathbb{R}^{n \times n}$
+
+$x\in\mathbb{R}^n\rightarrow z\in\mathbb{R}^k$
+
+$U_{reduce} =
+\begin{bmatrix}
+\textpipe & \textpipe & & \textpipe\\
+u^1 & u^2 & \cdots & u^k\\
+\textpipe & \textpipe & & \textpipe
+\end{bmatrix} \in \mathbb{R}^{n \times k}$
+
+Take the first $k$ vectors to reduce to $k$ dimensions.
+
+\begin{align*}
+Z &= U_{reduce}^T x\\
+  &= \begin{bmatrix}
+- & u^1 & -\\
+- & u^2 & -\\
+  & \vdots &   \\
+- & u^k & - \\
+\end{bmatrix}
+x
+\end{align*}
+
+Where $U_{reduce}^T$ is $k \times n$ and $x$ is $n \times 1$
+
+
+Choosing $k$ (number of principal components)
+
+Average squared projection error: $\frac{1}{m} \sum^m_{i=1} ||x^{(i)} - x_{approx}^{(i)}||^2$
+
+Total variation in the data: $\frac{1}{m} \sum^m_{i=1} ||x^{(i)}||^2$
+
+Typically, choose $k$ to be smallest value so that:
+\begin{align*}
+\frac
+{\frac{1}{m} \sum^m_{i=1} ||x^{(i)} - x_{approx}^{(i)}||^2}
+{\frac{1}{m} \sum^m_{i=1} ||x^{(i)}||^2} \leq 0.01
+\end{align*}
+
+"99% of variance is retained"
+
+## Algorithm
+
+Try PCA with $k=1$:
+
+**Compute**
+
+$U_{reduce},z^{(1)},z^{(2)},\dots,z^{(m)},x^{(1)}_{approx},\dots,x^{(m)}_{approx}$
+
+**Check if**
+
+\begin{align*}
+\frac
+{\frac{1}{m} \sum^m_{i=1} ||x^{(i)} - x_{approx}^{(i)}||^2}
+{\frac{1}{m} \sum^m_{i=1} ||x^{(i)}||^2} \leq 0.01
+\end{align*}
+
+
+$[U,S,V] = svd(\Sigma)$
+
+The $S$ matrix is a diagonal square matrix $n \times n$:
+
+\begin{align*}
+S = \begin{bmatrix}
+s_{11}   &        & \bigzero \\
+         & \ddots &          \\
+\bigzero &        & s_{nn}   \\
+\end{bmatrix}
+\end{align*}
+
+
+\begin{align*}
+\frac
+{\frac{1}{m} \sum^m_{i=1} ||x^{(i)} - x_{approx}^{(i)}||^2}
+{\frac{1}{m} \sum^m_{i=1} ||x^{(i)}||^2} = 1 -
+\frac
+{\sum_{i=1}^k S_{ii}}
+{\sum_{i=1}^n S_{ii}}
+\end{align*}
+
+\begin{align*}
+\frac
+{\sum_{i=1}^k S_{ii}}
+{\sum_{i=1}^n S_{ii}}
+\geq 0.99
+\end{align*}
+
+
+
+
 # A Tutorial on Principal Component Analysis
+\cite{shlens2014tutorial}
 
 Principal component analysis (PCA) is a simple, non-parametric method of extracting relevant information from confusing data sets. With minimal additional effort PCA provides a roadmap for how to reduce a complex data set to a lower dimension on reveal the sometimes hidden, simplified structure that ofter uderlies it.
 

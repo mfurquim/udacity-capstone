@@ -17,7 +17,7 @@ all:
 tex:
 	$(MAKE) -C md tex
 
-pdf: $(TEX_FILE) $(BIB_FILE)
+pdf:
 	$(LATEX) -shell-escape $(TEX_FILE)
 	$(BIBTEX) $(AUX_FILE)
 	$(LATEX) -shell-escape $(TEX_FILE)
