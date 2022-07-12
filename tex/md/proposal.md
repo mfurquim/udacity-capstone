@@ -1,3 +1,14 @@
+---
+title: Capstone Proposal
+author: Mateus Medeiros Furquim Mendonça
+header-includes:
+  - \usepackage{tikz}
+include-order: 'natural'
+rewrite-path: true
+pandoc-options:
+  - --filter=pandoc-include
+---
+
 # Domain Background
 
 One of the principal steps in the machine learning process is the feature engineering\cite{sarkar2017practical}.
@@ -17,15 +28,15 @@ The goal of the competition is to help a mail-order company, which sells organic
 To figure out which people in Germany are most likely to be new customers, the attributes of existing clients are analyzed and matched against a bigger data set that includes attributes for people in the country.
 
 Furthermore, it is expected that the PCA technique will improve the time to train the model and also improve the accuracy prediction of the model.
-This project will compare by how much the performance is increased by applying the PCA techinque.
+This project will try to understand how the performance of training and prediction is affected by applying the PCA techinque.
 
 # Datasets and Inputs
 
 The data set used in this project will be the Arvato's data set provided by the course in the Kaggle Competition\cite{arvato_kaggle_competition},
 The Arvato's data set is a compilation of financial data from their customers.
-The customers data set has 369 features (columns) and almost 200000 observations (rows), whereas the Germany data set contains 366 features (columns) almost 900000 observations (rows).
+The customers data set has 369 features (columns) and almost 200K observations (rows), whereas the Germany data set contains 366 features (columns) almost 900K observations (rows).
 The additional features from the customers data set are: customer_group, online_purchase, and product_group.
-On listing \ref{lst:add_feat} is a sample of those different features.
+On Listing \ref{lst:add_feat} there is a sample of those different features.
 
 \begin{listing}[htp]
   \inputminted{python}{code/sample_additional_features.py}
@@ -34,17 +45,185 @@ On listing \ref{lst:add_feat} is a sample of those different features.
 \end{listing}
 
 
+<!--!include`raw="latex"` raw_tex/sample_add_feat.tex-->
+
 # Solution Statement
 
-The model after having done the Principal Component Analysis will have a better performance when training and predicting the possible customers.
+The proposed solution is to understand the relationship between all 369 features and the likelihood of a German citizen being a customer.
+Because of the nature of the problem - i.e., having labeled data - we will train a supervised model to predict a potential customer and help the marketing team to focus their effort on them.
+
+Furthermore, the Principal Component Analysis will be done on the training set.
+A total of $K$ dimensions will be kept such that at least 85% of the variance is retained.
+The model will be trained using $k \in \left[K,m\right]$ features, where $m$ is the total number of features.
+For each dimension reduction, there will be a corresponding plot for the model's performance.
+
+At the end, there should be a clear visualization on how the dimensionality reduction affects the training speed and accuracy prediction.
+
+# Benchmark Model
+
+For this problem, the
 
 
+## https://towardsdatascience.com/the-f1-score-bec2bbc38aa6
+
+Accuracy is a metric for classification models that measures the number of predictions that are correct as a percentage of the total number of predictions that are made. As an example, if 90% of your predictions are correct, you8r accuracy is simply 90%
+
+\begin{align*}
+\textnormal{Accuracy} = \frac{\# \textnormal{ of correct predictions}}{\# \textnormal{ of total predictions}}
+\end{align*}
+
+Accuracy is a useful metric only when you have an equal distribution of classes on your classification. This means that if you have a use case in which you observe more data points of one class that of another, the accuracy is not a useful metric anymore.
+
+### Imbalanced data
+
+Sales data of a website that only 1% of website visitors buy something. Build classification model to predict which website visitors are buyers and which are just lookers.
+
+A model predicts that 100% of the visitors are just lookets. Clearly it is wrong and useless. But the accuracy of the model would be 99%, given that it only get wrong 1% of the predictions.
+
+### Solving by resampling
+
+One way to solve class imbalance problems is to work on your sample. With specific sampling methods, you can resample your data set in such a way that the data is not imbalanced anymore. You can then use accuracy as a metric again. [SMOTE](https://towardsdatascience.com/smote-fdce2f605729)
+
+### Solving throught metrics
+
+Another way to solve class imbalanca problems is to use better accuracy metrics like the F1 score, which take into account not only the number of prediction errors that your models makes, but that also look at the type of errors that are made.
+
+## Precision and Recall: foundations of the F1 score
+
+Precision and Recall are the two most common metrics that take into account class imbalance. Let's have a better look at Precision annd Recall before comibing them into the F1 score.
+
+### Precision
+
+\begin{align*}
+\textnormal{Precision} = \frac{\# \textnormal{ of  True Positives}}{\# \textnormal{ of True Positives} + \# \textnormal{ of False Positives}}
+\end{align*}
+
+This can be interpreted as **Within everything that has been predictec as a positive, precision counts the percentage that is correct.**
+
+- A **not precise model** may find a lot of positives, but its selection method is noisy: it also wrongly detects many positives that aren't actually positives.
+
+- A **precise model** is very "pure": maybe it does not find all the positives, but the ones that the model does class as positive are very likely to be correct.
+
+
+### Recal
+
+\begin{align*}
+\textnormal{Precision} = \frac{\# \textnormal{ of  True Positives}}{\# \textnormal{ of True Positives} + \# \textnormal{ of False Negatives}}
+\end{align*}
+
+This can be interpreted as **Within everything that has actually is positive, how manu did the model succeed to find.**
+
+- A model with **high recall** succeeds well in finding all the positive cases in the data, even though they may also wrongly identify some negative cases as positive cases.
+
+- A model with **low recall** is not able to find all (or a large part) of the positive cases in the data.
+
+### Precision vs Recall
+
+To clarify, think of the following example of a supermarket that has sold a product with a problem, and they need to recall it: they are only interested in making sure that they find all the problematic products back. It does not really matter to them if clients send back some non-problematic products as well, so the precision is not of interest to this supermarket.
+
+
+#### Precision-Recall Trade-Off
+
+Ideally, we would want both: a model that **identifies all of our positive cases** and that is at the same time **identifies only positive cases**.
+
+In many cases, you can tweak a model to increase precision at a cost of a lower recall, or on the other hand increase recall at the cost of lower precision.
+
+
+## The F1 score: combining Precision and Recall
+
+Precision and Recall are the two building blocks of the F1 score. The goal of the F1 score is to combine the precision and recall metrics into a single metric. At the same time, the F1 score has been designed to work well on imbalanced data.
+
+### F1 score formula
+
+The F1 score is defined as the harmonic mean of precision and recall.
+
+As a short reminder, the harmonic mean is an alternative metric for the more common arithmetic mean. It is often useful when computing an average rate.
+
+In the F1 score, we compute the average of pricesion and recall. They are both rates, which makes it a logical choice to use the harmonic mean. The F1 score formula is shown here:
+
+\begin{align*}
+\textnormal{F1 score} = 2 \times \frac{\textnormal{Precision} \times \textnormal{Recall}}{\textnormal{Precision} + \textnormal{Recall}}
+\end{align*}
+
+Since the F1 score is an average of Precision and Recall, it means that the F1 score gives equal weight to Precision and Recall:
+
+- A model will obtain a **high F1 score** if both Precision and Recall are high
+
+- A model will obtain a **low F1 score** if both Precision and Recall are low
+
+- A model will obtain a **medium F1 score** if one of Precision and Recall is low and the other is high
+
+## Accuracy vs Precision and Recall
+
+Accuracy is the simples classification metric. It simply measures the percentage of correct predictions that a machine learning model has made. You have seen that accuracty is a bad metric in the case of imbalanced data because it cannot distinguish between specific types of errors (false positives and false negatives).
+
+Precision and Recall are performance metrics that are more suitable when having imbalanced data because they allow taking into account the type of errors (false positives or false negatives) that your model makes.
+
+The F1 score combines Precision and Recall into a single metric. In many situations [GridSearch: the ultimate Machine Learning Tool](https://towardsdatascience.com/gridsearch-the-ultimate-machine-learning-tool-6cd5fb93d07) it is much more convenient to have only one performance metric rather than multiple.
+
+
+## Example in Python
+
+### Verifying class imbalance
+
+Plot a histogram for class 0 and 1.
+Or see percentage.
+
+Stratified sampling is a sampling method that avoids disturbing class balance in your samples.
+It generates train and test set with the exact same class balance as in the original data.
+It can be obtained with the code at Listing \ref{lst:stratified_sampling}.
+
+\begin{listing}[htp]
+  \inputminted{python}{code/stratified_train_test.py}
+  \caption{Stratified sampling}
+  \label{lst:stratified_sampling}
+\end{listing}
+
+
+
+
+<p>You may submit a maximum of 2 entries per day.</p>
+
+
+
+
+
+
+For this proble, the F1 score of 1 is the best benchmark model.
+Also, compare our model prediction result to the submission file offered by kaggle will also serve as a benchmark model.
+The model prediction will have to match all the results in the kaggle submission file.
+
+Kaggle score. (limit 5 entries per day)
+For accademic purposes, we would use a part of traning data as testing data.
+
+For the benchmark model, we will use the algorithms outlined in the paper _A Dataset and Taxonomy for Urban Sound Research_ (Salamon, 2014).
+The paper describes 5 diff algo with accuracies for audio slice max 4 sec.
+
+Logistic regression model will be used as the benchmark for this project (fast, simple to implement, better result than random guessing).
+Secondary benchmark will be the result of the final solution compared to the team that won the competition.
+Submissions to the competition were judged on the _area under the ROC curve (auc)_ metric.
+Therefore, this metric will be used to compare the results.
 
 # Evaluation Metrics
 
 We will train the model without applying any PCA technique and measure the time it takes to train, the loss over epochs, the accuracy, fallback and the other 2 (they relate false negative to overall negatives and so on* search for these names)
 
 Benchmark model, we will use a model without PCA and with PCA to compare the solution.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

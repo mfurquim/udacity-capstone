@@ -5,7 +5,8 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{indentfirst}
-\usepackage{color}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{units}
 \usepackage[english,hyperpageref]{backref}
@@ -24,6 +25,7 @@
 \usepackage{tipa}
 \usepackage{mathabx}
 \usepackage{upgreek}
+\usepackage{longtable}
 
 \newcommand\bigzero{\makebox(0,0){\text{\huge0}}}
 \renewcommand{\arraystretch}{1.618033988749894848204586834365638117720309179805762862135448}
@@ -122,7 +124,7 @@ pdfkeywords={Machine Learning Engineer, Nanodegree, Udacity, Principal Component
 
 \setminted[python]{
 	autogobble,
-	fontsize=\footnotesize,
+	fontsize=\scriptsize,
 	frame=single,
 	highlightlines=0,
 	labelposition=all,
