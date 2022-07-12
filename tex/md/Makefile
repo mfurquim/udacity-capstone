@@ -1,5 +1,5 @@
 CC=pandoc
-FLAGS=--filter pandoc-eqnos --filter pandoc-tablenos --from=markdown-smart --to=latex --indented-code-classes=numberLines --highlight-style=zenburn --listings --ascii --number-sections
+FLAGS=--filter pandoc-eqnos --filter pandoc-tablenos --filter pandoc-include --from=markdown-smart --to=latex --indented-code-classes=numberLines --highlight-style=zenburn --listings --ascii --number-sections
 
 tex:
 	@echo "MD -> TEX"

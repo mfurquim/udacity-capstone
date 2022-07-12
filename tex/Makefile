@@ -18,10 +18,10 @@ tex:
 	$(MAKE) -C md tex
 
 pdf:
-	$(LATEX) -shell-escape $(TEX_FILE)
+	$(LATEX) -interaction nonstopmode -halt-on-error -file-line-error -shell-escape $(TEX_FILE)
 	$(BIBTEX) $(AUX_FILE)
-	$(LATEX) -shell-escape $(TEX_FILE)
-	$(LATEX) -shell-escape $(TEX_FILE)
+	$(LATEX) -interaction nonstopmode -halt-on-error -file-line-error -shell-escape $(TEX_FILE)
+	$(LATEX) -interaction nonstopmode -halt-on-error -file-line-error -shell-escape $(TEX_FILE)
 	@cp -v $(TARGET) ../$(TARGET)
 	@rm -vf *.brf *.lol *.idx *.lof *.lot *.toc *.bbl *.blg *.log *.aux *.dvi *.out
 
