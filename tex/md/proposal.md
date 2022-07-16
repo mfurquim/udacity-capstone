@@ -36,7 +36,7 @@ The data set used in this project will be the Arvato's data set provided by the 
 The Arvato's data set is a compilation of financial data from their customers.
 The customers data set has 369 features (columns) and almost 200K observations (rows), whereas the Germany data set contains 366 features (columns) almost 900K observations (rows).
 The additional features from the customers data set are: customer_group, online_purchase, and product_group.
-On Listing \ref{lst:add_feat} there is a sample of those different features.
+On Listing \ref{lst:add_feat} there is a few examples of those different features.
 
 \begin{listing}[htp]
   \inputminted{python}{code/sample_additional_features.py}
@@ -62,6 +62,36 @@ At the end, there should be a clear visualization on how the dimensionality redu
 # Benchmark Model
 
 For this problem, the
+Benchmark model, we will use a model without PCA and with PCA to compare the solution.
+
+<p>You may submit a maximum of 2 entries per day.</p>
+
+
+
+
+
+
+
+
+For this proble, the F1 score of 1 is the best benchmark model.
+Also, compare our model prediction result to the submission file offered by kaggle will also serve as a benchmark model.
+The model prediction will have to match all the results in the kaggle submission file.
+
+Kaggle score. (limit 5 entries per day)
+For accademic purposes, we would use a part of traning data as testing data.
+
+For the benchmark model, we will use the algorithms outlined in the paper _A Dataset and Taxonomy for Urban Sound Research_ (Salamon, 2014).
+The paper describes 5 diff algo with accuracies for audio slice max 4 sec.
+
+Logistic regression model will be used as the benchmark for this project (fast, simple to implement, better result than random guessing).
+Secondary benchmark will be the result of the final solution compared to the team that won the competition.
+Submissions to the competition were judged on the _area under the ROC curve (auc)_ metric.
+Therefore, this metric will be used to compare the results.
+
+# Evaluation Metrics
+
+We will train the model without applying any PCA technique and measure the time it takes to train, the loss over epochs, the accuracy, fallback and the other 2 (they relate false negative to overall negatives and so on* search for these names)
+
 
 
 ## https://towardsdatascience.com/the-f1-score-bec2bbc38aa6
@@ -105,10 +135,10 @@ This can be interpreted as **Within everything that has been predictec as a posi
 - A **precise model** is very "pure": maybe it does not find all the positives, but the ones that the model does class as positive are very likely to be correct.
 
 
-### Recal
+### Recall
 
 \begin{align*}
-\textnormal{Precision} = \frac{\# \textnormal{ of  True Positives}}{\# \textnormal{ of True Positives} + \# \textnormal{ of False Negatives}}
+\textnormal{Recall} = \frac{\# \textnormal{ of  True Positives}}{\# \textnormal{ of True Positives} + \# \textnormal{ of False Negatives}}
 \end{align*}
 
 This can be interpreted as **Within everything that has actually is positive, how manu did the model succeed to find.**
@@ -179,44 +209,106 @@ It can be obtained with the code at Listing \ref{lst:stratified_sampling}.
   \label{lst:stratified_sampling}
 \end{listing}
 
+As a baseline model, create a very bad model that predicts that nobody buys anything.
+This comes down to generating a list of predictions that are all 0, as the Listing \ref{lst:very_bad_model}.
+
+\begin{listing}[htp]
+  \inputminted{python}{code/very_bad_model.py}
+  \caption{Very bad model}
+  \label{lst:very_bad_model}
+\end{listing}
+
+Even though we already know this model is very bad, let's still found out the accuracy using scikitlearn's function as seen in Listing \ref{lst:very_bad_accuracy}.
+
+\begin{listing}[htp]
+  \inputminted{python}{code/very_bad_accuracy.py}
+  \caption{Very bad model's Accuracy}
+  \label{lst:very_bad_accuracy}
+\end{listing}
+
+The accuracy of the very bad models is surprisingly high: 95%!
+The model predicts that nobody buys anything. Therefore, it is wrong only for the buyers (5% of the data set).
+
+This is the exact reason why we need to worry about Recall and Precision. Let's use the code on Listing \ref{lst:very_bad_prec_recall} to compute the Recall and Precision of this model.
+
+\begin{listing}[htp]
+  \inputminted{python}{code/very_bad_prec_recall.py}
+  \caption{Very bad model's Precision and Recall}
+  \label{lst:very_bad_prec_recall}
+\end{listing}
+
+Precision will tell the percentage of correctly predicted buyers as a percentage of the total number of predicted buyers.
+Not a single person was identified as a buyer, therefore the precision is 0!
+
+Recall, on the other hand, tells the percentage of buyers that have been identified within all actual buyers.
+Since the model has not found any, the recall is also 0!
+
+As the F1 score is the harmonic mean of precision and recall, the F1 score is also 0.
+The F1 score can be computed using the code in Listing \ref{lst:very_bad_f1_score}.
+
+\begin{listing}[htp]
+  \inputminted{python}{code/very_bad_f1_score.py}
+  \caption{Very bad model's F1 Score}
+  \label{lst:very_bad_f1_score}
+\end{listing}
+
+The model is not intelligent, yet it shows the danger in using accuracy as a metric on imabalanced data sets.
+
+### A better model
+
+Use Logistic Regression model for a second example. Take a look at Listing \ref{lst:better_model_LR}.
+
+\begin{listing}[htp]
+  \inputminted{python}{code/better_model_LR.py}
+  \caption{Better Model with Logistic Regression}
+  \label{lst:better_model_LR}
+\end{listing}
+
+Use confusion matrix to do a detailed inspection of the predictions (Listing \ref{lst:better_model_CM}).
+
+\begin{listing}[htp]
+  \inputminted{python}{code/better_model_CM.py}
+  \caption{Confusion Matrix}
+  \label{lst:better_model_CM}
+\end{listing}
+
+Remembering that:
+
+- True positives are buyers correctly predicted as buyers
+
+- False positives are non-buyers incorrectly predicted as buyers
+
+- True negatives are non-buyers correctly predicted as non-buyers
+
+- False negatives are buyers incorrectly predicted as non-buyers
+
+The result is the following:
 
 
+!include`raw="latex"` raw_tex/f1_score_confusion_matrix.tex
 
-<p>You may submit a maximum of 2 entries per day.</p>
+- True negatives: 280
 
+- False positives: 5
 
+- False negatives: 10
 
+- True positives: 5
 
+This model evaluation data is very detailed.
+The accuracy is also 95%.
 
+But the precision is 0.5 and the recall is 0.33
 
-For this proble, the F1 score of 1 is the best benchmark model.
-Also, compare our model prediction result to the submission file offered by kaggle will also serve as a benchmark model.
-The model prediction will have to match all the results in the kaggle submission file.
-
-Kaggle score. (limit 5 entries per day)
-For accademic purposes, we would use a part of traning data as testing data.
-
-For the benchmark model, we will use the algorithms outlined in the paper _A Dataset and Taxonomy for Urban Sound Research_ (Salamon, 2014).
-The paper describes 5 diff algo with accuracies for audio slice max 4 sec.
-
-Logistic regression model will be used as the benchmark for this project (fast, simple to implement, better result than random guessing).
-Secondary benchmark will be the result of the final solution compared to the team that won the competition.
-Submissions to the competition were judged on the _area under the ROC curve (auc)_ metric.
-Therefore, this metric will be used to compare the results.
-
-# Evaluation Metrics
-
-We will train the model without applying any PCA technique and measure the time it takes to train, the loss over epochs, the accuracy, fallback and the other 2 (they relate false negative to overall negatives and so on* search for these names)
-
-Benchmark model, we will use a model without PCA and with PCA to compare the solution.
+The F1 score is 0.4
 
 
+The F1 score becomes specially valuably when working on classification models in which your data set is imbalanced.
 
+F1 score combines precision and recall into a single metric.
+This makes it easy to use in grid search or automated optimization.
 
-
-
-
-
+It was shown how accuracy can be misleading.
 
 
 
