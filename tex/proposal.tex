@@ -1,3 +1,197 @@
+\documentclass[10pt,twoside,twocolumn,nofonttune,a4paper,journal,compsoc,english,french,spanish]{IEEEtran}
+
+\usepackage{cmap}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{indentfirst}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{units}
+\usepackage[english,hyperpageref]{backref}
+\usepackage{bold-extra}
+\usepackage[hyphens]{url}
+\usepackage{eso-pic}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{bm}
+\usepackage[framemethod=TikZ]{mdframed}
+\usepackage{showexpl}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{tipa}
+\usepackage{mathabx}
+\usepackage{upgreek}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{ragged2e}
+\usepackage{multicol}
+\usepackage{lineno}
+\usepackage{tabularx}
+\usepackage{realboxes}
+\usepackage{xpatch}
+
+
+\providecommand{\tightlist}{%
+	  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\newcommand{\passthrough}[1]{#1}
+
+
+\newcommand\bigzero{\makebox(0,0){\text{\huge0}}}
+\renewcommand{\arraystretch}{1.618033988749894848204586834365638117720309179805762862135448}
+
+\definecolor{NordBG}{HTML}{242933}              % nord00
+% Polar Night
+\definecolor{NordDarkBlack}{HTML}{2E3440}       % nord0
+\definecolor{NordBlack}{HTML}{3B4252}           % nord1
+\definecolor{NordMediumBlack}{HTML}{434C5e}     % nord2
+\definecolor{NordBrightBlack}{HTML}{4C566A}     % nord3
+\definecolor{NordBrightBlack10}{HTML}{616e88}   % nord3 + 10%
+\definecolor{NordBrightBlack12}{HTML}{66738e}   % nord3 + 12%
+% Snow Storm
+\definecolor{NordWhite}{HTML}{D8DEE9}           % nord4
+\definecolor{NordBrighterWhite}{HTML}{E5E9F0}   % nord5
+\definecolor{NordBrightestWhite}{HTML}{ECEFF4}  % nord6
+% Frost
+\definecolor{NordCyan}{HTML}{8FBCBB}            % nord7
+\definecolor{NordBrightCyan}{HTML}{88C0D0}      % nord8
+\definecolor{NordBrightBlue}{HTML}{81A1C1}      % nord9
+\definecolor{NordBlue}{HTML}{5E81AC}            % nord10
+% Aurora
+\definecolor{NordRed}{HTML}{BF616A}             % nord11
+\definecolor{NordOrange}{HTML}{D08770}          % nord12
+\definecolor{NordYellow}{HTML}{EBCB8B}          % nord13
+\definecolor{NordGreen}{HTML}{A3BE8C}           % nord14
+\definecolor{NordMagenta}{HTML}{B48EAD}         % nord15
+
+\lstset{%
+	basicstyle=\ttfamily,
+	breaklines = true,
+	backgroundcolor=\color{NordMagenta},
+}
+
+\makeatletter
+\xpretocmd\lstinline
+{%
+	\bgroup\fboxsep=0pt
+	\Colorbox{NordWhite}\bgroup\kern-\fboxsep\vphantom{\ttfamily\char`\\y}%
+	\appto\lst@DeInit{\kern-\fboxsep\egroup\egroup}%
+}{}{}
+\makeatother
+
+\newcommand\MYhyperrefoptions{%
+bookmarks=true,bookmarksnumbered=true,%
+pdfpagemode={UseOutlines},plainpages=false,pdfpagelabels=true,%
+colorlinks=true,linkcolor={black},citecolor={black},pagecolor={black},%
+urlcolor={black},%
+pdftitle={Machine Learning Engineer Nanodegree, Capstone Proposal},%
+pdfsubject={Capstone Proposal},%<!CHANGE!
+pdfauthor={Mateus M. F. Mendonça},%
+pdfkeywords={Machine Learning Engineer, Nanodegree, Udacity, Principal Component Analysis, PCA}%
+}
+
+% \newmdenv[tikzsetting={fill=NordDarkBlack,},settings={\tikzset{every picture/.style={opacity=0.1}}}]{myenvironment}
+
+\mdfdefinestyle{code}{%
+	innertopmargin=0pt,
+	innerbottommargin=12pt,
+	skipabove=\baselineskip,
+	skipbelow=\baselineskip,
+	leftmargin=6pt,
+	rightmargin=6pt,
+	innerleftmargin=3,
+	innerrightmargin=2,
+	rightline=true,
+	frametitlerule=true,
+	backgroundcolor=NordDarkBlack,
+	frametitlerulewidth=0.2pt,
+	frametitlealignment=\center,
+	frametitleaboveskip=5pt,
+	frametitlebelowskip=3pt,
+	frametitlebackgroundcolor=NordBrightestWhite,
+	align=center,
+	linecolor=NordWhite,
+	linewidth=1pt,
+	shadow=false,
+	shadowsize=3pt,
+	shadowcolor=NordBG,
+	roundcorner=3pt
+}
+
+\mdfdefinestyle{output}{%
+	innertopmargin=0pt,
+	innerbottommargin=12pt,
+	skipabove=\baselineskip,
+	skipbelow=\baselineskip,
+	leftmargin=6pt,
+	rightmargin=6pt,
+	innerleftmargin=3,
+	innerrightmargin=2,
+	rightline=true,
+	frametitlerule=true,
+	backgroundcolor=white,
+	frametitlerulewidth=0.2pt,
+	frametitlealignment=\center,
+	frametitleaboveskip=5pt,
+	frametitlebelowskip=3pt,
+	frametitlebackgroundcolor=NordBrightestWhite,
+	align=center,
+	linecolor=NordWhite,
+	linewidth=1pt,
+	shadow=false,
+	shadowsize=3pt,
+	shadowcolor=NordBG,
+	roundcorner=3pt
+}
+
+\begin{document}
+
+% \usemintedstyle{nord}
+
+\setminted[python]{
+	autogobble,
+	fontsize=\scriptsize,
+	frame=single,
+	highlightlines=0,
+	labelposition=all,
+	linenos=false,
+	numbers=none,
+	obeytabs=false,
+	python3=true,
+	resetmargins=true,
+	rulecolor=NordBG,
+	samepage=true,
+	tabsize=4,
+	texcomments=true,
+	breaksymbolleft=\textcolor{NordBrightBlack}{\tiny$\hookrightarrow$}
+}
+
+
+\title{\textbf{Machine Learning Engineer Nanodegree}\\
+        Capstone Proposal}
+
+\author{Mateus Medeiros Furquim Mendonça - mateus@mfurquim.dev}
+
+\markboth{Capstone Proposal - \today}% June 11$^{\lowercase{th}}$\hskip-1pt, 2022}
+{M. Mendonça: Capstone Proposal}
+
+% \IEEEcompsoctitleabstractindextext{%
+%     \begin{abstract}
+% 		The relationship between reduction of dimensionality with from a dataset with training performance and prediction accuracy.
+%     \end{abstract}
+
+%     \begin{IEEEkeywords}
+% 		Principal Component Analysis, PCA, Arvato, Kaggle, Udacity
+%     \end{IEEEkeywords}
+% }
+
+\maketitle
+
+\IEEEdisplaynontitleabstractindextext
+
 \hypertarget{domain-background}{%
 \section{Domain Background}\label{domain-background}}
 
@@ -145,3 +339,12 @@ next step will be to apply the PCA technique to reduce the number of
 dimensions such that at least 85\% of the variance is retained. For each
 dimension reduction, a new model will be trained and evaluated in order
 to get the corresponding computation time and the AUC.
+% \section{Source code}
+
+\bibliographystyle{IEEEtran}
+\bibliography{proposal.bib}
+
+% \appendices
+
+\end{document}
+
